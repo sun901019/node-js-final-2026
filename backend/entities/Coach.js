@@ -1,4 +1,4 @@
-const{EntitySchema} = require('@mikro-orm/core');
+const{EntitySchema} = require('typeorm');
 
 module.exports = new EntitySchema({
     name: 'Coach',

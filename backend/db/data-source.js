@@ -1,4 +1,5 @@
-require('dotenv').config("../config/index")
+const config = require('../config')
+
 const { DataSource } = require('typeorm')
 
 const dataSource = new DataSource({
@@ -8,8 +9,8 @@ const dataSource = new DataSource({
   username: config.get("db.username"),
   password: config.get("db.password"),
   database: config.get("db.database"),
-  synchronize: config.get("db.synchronize") === 'true',
-  ssl: config.get("db.ssl") === 'true',
+  synchronize: config.get("db.synchronize") ,
+  ssl: config.get("db.ssl") ,
   entities: [
     require('../entities/User'),
     require('../entities/Coach'),
