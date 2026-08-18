@@ -4,6 +4,7 @@ const config = require("./config")
 const {dataSource}= require("./db/data-source");
 const appError = require("./utils/appError");
 const skill = require("./routes/skill")
+const users = require("./routes/users")
 const app = express()
 app.use(cors())          // W3：前端在 3000、我們在 8080，沒它前端全被擋
 app.use(express.json())
@@ -20,6 +21,7 @@ app.get('/healthcheck', async (req, res, next) => {
   }
 })
 app.use("/api/coaches/skill",skill)
+app.use("/api/users", users)
 
 
 // 404（W3）
