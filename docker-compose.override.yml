@@ -1,0 +1,11 @@
+# 【本機開發用的臨時檔，非作業內容】
+# 原因：這台電腦本機安裝了 PostgreSQL（Windows 服務 postgresql-x64-17 / 18），
+# 它佔住了 5432，Docker 的 postgres 收不到連線（後端會報 password authentication failed，
+# 因為連到的是「本機那顆」而不是 Docker 這顆）。
+# （5433 也被本機的第二個 PostgreSQL 服務 postgresql-x64-18 佔走，所以用 15432）
+# 這個 override 檔會被 docker compose 自動合併，替 Docker 的 postgres 多開一個 15432 對外埠。
+# 若日後停用/移除本機 PostgreSQL 服務，可刪除此檔並把 backend/.env 的 DB_PORT 改回 5432。
+services:
+  postgres:
+    ports:
+      - "15432:5432"

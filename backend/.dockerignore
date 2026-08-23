@@ -1,0 +1,5 @@
+# ✚【全新檔案，原本缺少/容器化】COPY . . 時要排除的東西：
+# node_modules：本機裝的是 Windows 版二進位檔，容器是 Linux，帶進去會壞；容器內用 npm ci 重裝
+# .env：機密不進 image（image 可能被推到公開 registry）；容器的環境變數由 docker-compose 提供
+node_modules
+.env

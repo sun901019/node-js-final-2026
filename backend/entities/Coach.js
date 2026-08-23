@@ -9,8 +9,10 @@ module.exports = new EntitySchema({
         experience_years:{type:"int", nullable:false,default:0},
         description:{type:"text", nullable:true},
         profile_image_url:{type:"varchar", length:2048, nullable:true},
-        createdAt:{type:"timestamp", createDate:true},
-        updatedAt:{type:"timestamp", updateDate:true},
+        // ❌【原本寫錯（風格不一致）】createdAt/updatedAt → created_at/updated_at（對齊 week9 範例；
+        // M4 教練列表要 order by created_at ASC，欄位名一致 controller 才好寫）
+        created_at:{type:"timestamp", createDate:true},
+        updated_at:{type:"timestamp", updateDate:true},
     },
     relations: {
         user: {

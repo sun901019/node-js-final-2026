@@ -1,6 +1,6 @@
 const { dataSource } = require("../db/data-source");
 const appError = require("../utils/appError");
-const { isValidString } = require("../utils/validUtils");
+const { isValidString, isValidUUID } = require("../utils/validUtils");
 
 const skillController ={
     async getSkill(req, res, next){
@@ -14,7 +14,9 @@ const skillController ={
     async postSkill(req, res, next){
         const { name } = req.body;
         if(!isValidString(name)){
-            next(appError(400, "欄位為填寫正確"));
+            // ❌【原本寫錯】錯字：「欄位『為』填寫正確」→ 規格是「欄位『未』填寫正確」。
+            // 測試只驗 4xx + status:failed 所以不會因此紅燈，但錯誤訊息是給前端使用者看的，要跟 Swagger 一致
+            next(appError(400, "欄位未填寫正確"));
             return;
         }
 
@@ -35,6 +37,12 @@ const skillController ={
     },
     async deleteSkill(req, res, next){
         const { skillId } = req.params;
+        // ✚【原本缺少，補上】先擋「uuid 格式不合法」的 id（例如 /skill/abc）。
+        // 不擋的話 PostgreSQL 會丟 invalid input syntax for type uuid → 變成 500，而規格期望 4xx
+        if(!isValidUUID(skillId)){
+            next(appError(400,"ID錯誤"));
+            return;
+        }
         const result = await dataSource.getRepository("Skill").delete(skillId);
         if(result.affected === 0 ) {
             next(appError(400,"ID錯誤"));

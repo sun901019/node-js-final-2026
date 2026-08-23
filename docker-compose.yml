@@ -52,22 +52,31 @@ services:
   #   - 要有 healthcheck（打你的 GET /healthcheck）
   #   - depends_on postgres 的 healthy
   # ============================================================
-  # backend:
-  #   build:
-  #     context: ____
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "____:____"
-  #   environment:     # 需要哪些變數？可根據 .env.example 對照補齊
-  #     - PORT=____
-  #     - DB_HOST=____
-  #     # …其餘 DB_ 連線資訊與 JWT 設定自行補上
-  #   depends_on:
-  #     postgres:
-  #       condition: ____
-  #   healthcheck:
-  #     # 把網址補成你的 PORT 與 /healthcheck 路徑
-  #     test: ["CMD-SHELL", "node -e \"fetch('http://localhost:____/____').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
-  #     interval: 10s
-  #     timeout: 3s
-  #     retries: 5
+  # ✚【原本缺少，補上/容器化】backend 服務（規則：服務名必須叫 backend、對外開 8080）
+  backend:
+    build:
+      context: ./backend        # 用 backend/ 資料夾當 build 素材，讀裡面的 Dockerfile
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"             # 主機的 8080 → 容器的 8080（前端與測試都打主機的 8080）
+    environment:                # 容器「不會」讀 .env（被 .dockerignore 排除），變數全靠這裡給
+      - PORT=8080
+      - DB_HOST=postgres        # ⚠️ 容器內沒有 localhost 這回事，要用 Compose 的「服務名」連資料庫
+      - DB_PORT=5432
+      - DB_USERNAME=student
+      - DB_PASSWORD=student666
+      - DB_DATABASE=fitness
+      - JWT_SECRET=hexschool2026finalproject
+      - JWT_EXPIRES_DAY=30d
+      - DB_SYNCHRONIZE=true     # CI 是全新空資料庫，要靠它自動建表
+      - DB_ENABLE_SSL=false
+    depends_on:
+      postgres:
+        condition: service_healthy   # 等 postgres 的 healthcheck 通過才啟動 backend，避免連線失敗
+    healthcheck:
+      # CI 靠這個判斷 backend 活著沒：進容器用 node 打自己的 GET /healthcheck
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:8080/healthcheck').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
