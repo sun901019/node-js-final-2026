@@ -12,3 +12,4 @@ const dataSource = new DataSource({
     ssl: config.get("db.ssl"),
     entities: [User, Skill, CreditPurchase, CreditPackage, CourseBooking, CourseBooking, CoachLinkSkill, Coach],
 });
+module.exports = { dataSource };
