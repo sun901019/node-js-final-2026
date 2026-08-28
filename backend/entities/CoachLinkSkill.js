@@ -1,15 +1,17 @@
-const { EntitySchema, JoinColumn } = require("typeorm");
+const { EntitySchema } = require("typeorm");
 module.exports = new EntitySchema({
     name: "CoachLinkSkill",
     tableName: "coach_link_skill",
     columns: {
         coach_id: {
             type: "uuid",
-            nullable: "false",
+            nullable: false,
+            primary: true,
         },
         skill_id: {
             type: "uuid",
             nullable: false,
+            primary: true,
         },
     },
     relations: {
@@ -17,7 +19,7 @@ module.exports = new EntitySchema({
             type: "many-to-one",
             target: "Coach",
             joinColumn: {
-                name: coach_id,
+                name: "coach_id",
             },
             onDelete: "CASCADE",
         },
@@ -25,7 +27,7 @@ module.exports = new EntitySchema({
             type: "many-to-one",
             target: "Skill",
             joinColumn: {
-                name: skill_id,
+                name: "skill_id",
             },
             onDelete: "CASCADE",
         },

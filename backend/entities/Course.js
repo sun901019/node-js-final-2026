@@ -60,10 +60,10 @@ module.exports = new EntitySchema({
                 name: "user_id",
             },
         },
-        skull: {
+        skill: {
             type: "many-to-one",
-            target: "skill_id",
-            JoinColumn: {
+            target: "Skill",
+            joinColumn: {
                 name: "skill_id",
             },
         },

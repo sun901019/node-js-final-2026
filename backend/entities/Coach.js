@@ -1,19 +1,19 @@
-const { EntitySchema, JoinColumn } = require("typeorm");
+const { EntitySchema } = require("typeorm");
 module.exports = new EntitySchema({
     name: "Coach",
     tableName: "coaches",
     columns: {
         id: {
             type: "uuid",
-            primary: "true",
+            primary: true,
             generated: "uuid",
         },
         user_id: {
             type: "uuid",
-            nullable: "false",
+            nullable: false,
             unique: true,
         },
-        experence_years: {
+        experience_years: {
             type: "integer",
             nullable: false,
         },
@@ -32,14 +32,14 @@ module.exports = new EntitySchema({
         },
         updated_at: {
             type: "timestamp",
-            createDate: true,
+            updateDate: true,
         },
     },
     relations: {
         user: {
             type: "one-to-one",
             target: "User",
-            JoinColumn: {
+            joinColumn: {
                 name: "user_id",
             },
         },
