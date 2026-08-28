@@ -5,6 +5,8 @@ const { dataSource } = require("./db/data-source");
 const skill = require("./routes/skill");
 const users = require("./routes/users");
 const creditPackage = require("./routes/creditPackage");
+const adminCoaches = require("./routes/adminCoaches");
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -22,6 +24,7 @@ app.get("/healthcheck", async (req, res, next) => {
 app.use("/api/coaches/skill", skill);
 app.use("/api/users", users);
 app.use("/api/credit-package", creditPackage);
+app.use("/api/admin/coaches", adminCoaches);
 
 // 404 錯誤
 app.use((req, res, next) => {
