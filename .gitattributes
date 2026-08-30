@@ -1,0 +1,10 @@
+# 跨平台換行控制（本專案在 Windows 開發、Linux 容器與 CI 執行）
+# 只強制「進到 Linux 執行」的檔案用 LF，其餘交給 git 預設處理，
+# 避免 Windows 的 CRLF 讓 shebang 變成 #!/bin/sh\r 而執行失敗。
+
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+*.Dockerfile    text eol=lf
+.dockerignore   text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf

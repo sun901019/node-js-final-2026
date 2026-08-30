@@ -5,6 +5,6 @@ const isCoach = require("../middlewares/isCoach");
 
 router.post("/:userId", adminCoachesController.postPromoteCoach);
 router.get("/", isAuth, isCoach, adminCoachesController.getCoachProfile);
-router.put("/:creditPackageId", adminCoachesController.putUpdateCoachProfile);
+router.put("/", isAuth, isCoach, adminCoachesController.putUpdateCoachProfile);
 
 module.exports = router;
