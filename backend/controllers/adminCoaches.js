@@ -55,7 +55,7 @@ const adminCoachesController = {
   async getCoachProfile(req, res, next) {
     const coachRepo = dataSource.getRepository("Coach");
     const findCoach = await coachRepo.findOneBy({
-      user_id: req.ues.id,
+      user_id: req.user.id,
     });
     const coachLinkSkillRepo = dataSource.getRepository("CoachLinkSkill");
     const coachLinkSkills = await coachLinkSkillRepo.find({

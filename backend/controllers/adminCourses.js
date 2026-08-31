@@ -88,16 +88,81 @@ const adminCoursesController = {
     return;
   },
   async getCourse(req, res, next) {
+    const { courseId } = req.params;
+    const userId = req.user.id;
+    const courseRepo = dataSource.getRepository("Course");
+
+    const course = await courseRepo.findOne({
+      where: {
+        id: courseId,
+        user_id: userId,
+      },
+      relations: {
+        skill: true,
+      },
+    });
+    if (!course) {
+      next(appError(400, "課程不存在"));
+      return;
+    }
     res.json({
       status: "success",
-      data: {},
+      data: {
+        id: course.id,
+        name: course.name,
+        description: course.description,
+        start_at: course.start_at,
+        end_at: course.end_at,
+        max_participants: course.max_participants,
+        skill_name: course.skill.name,
+        skill_id: course.skill_id,
+        meeting_url: course.meeting_url,
+      },
     });
     return;
   },
   async putUpdateCourse(req, res, next) {
+    const { courseId } = req.params;
+    const userId = req.user.id;
+    const { skill_id, name, description, start_at, end_at, max_participants, meeting_url } = req.body;
+    if (
+      !isValidString(skill_id) ||
+      !isInteger(max_participants) ||
+      !isValidString(name) ||
+      !isValidString(description) ||
+      !isValidString(start_at) ||
+      !isValidString(end_at) ||
+      !isValidString(meeting_url) ||
+      !meeting_url.startsWith("https") ||
+      max_participants < 0
+    ) {
+      next(appError(400, "欄位未填寫正確"));
+      return;
+    }
+    const courseRepo = dataSource.getRepository("Course");
+
+    const course = await courseRepo.findOneBy({
+      id: courseId,
+      user_id: userId,
+    });
+
+    if (!course) {
+      next(appError(400, "課程不存在"));
+      return;
+    }
+    course.skill_id = skill_id;
+    course.name = name.trim();
+    course.description = description.trim();
+    course.start_at = start_at;
+    course.end_at = end_at;
+    course.max_participants = max_participants;
+    course.meeting_url = meeting_url;
+    const updatedCourse = await courseRepo.save(course);
     res.json({
       status: "success",
-      data: {},
+      data: {
+        course: updatedCourse,
+      },
     });
     return;
   },
