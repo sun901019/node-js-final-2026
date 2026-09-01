@@ -6,4 +6,6 @@ router.post("/login", usersController.login);
 router.get("/profile", isAuth, usersController.getProfile);
 router.put("/profile", isAuth, usersController.updateProfile);
 router.put("/password", isAuth, usersController.putPassword);
+router.get("/credit-package", isAuth, usersController.getCreditPurchases);
+router.get("/courses", isAuth, usersController.getUserCourses);
 module.exports = router;

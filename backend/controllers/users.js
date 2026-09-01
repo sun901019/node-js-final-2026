@@ -106,19 +106,11 @@ const usersController = {
   },
   async putPassword(req, res, next) {
     const { password, new_password, confirm_new_password } = req.body;
-    if (
-      !isValidString(password) ||
-      !isValidString(new_password) ||
-      !isValidString(confirm_new_password)
-    ) {
+    if (!isValidString(password) || !isValidString(new_password) || !isValidString(confirm_new_password)) {
       next(appError(400, "欄位未填寫正確"));
       return;
     }
-    if (
-      !isValidPassword(password) ||
-      !isValidPassword(new_password) ||
-      !isValidPassword(confirm_new_password)
-    ) {
+    if (!isValidPassword(password) || !isValidPassword(new_password) || !isValidPassword(confirm_new_password)) {
       next(appError(400, PWD_ERR));
       return;
     }
@@ -176,6 +168,86 @@ const usersController = {
         user: {
           name: newName,
         },
+      },
+    });
+    return;
+  },
+  async getCreditPurchases(req, res, next) {
+    const userId = req.user.id;
+
+    const creditPurchaseRepo = dataSource.getRepository("CreditPurchase");
+
+    const creditPurchases = await creditPurchaseRepo.find({
+      where: {
+        user_id: userId,
+      },
+      relations: {
+        creditPackage: true,
+      },
+      order: {
+        purchase_at: "DESC",
+      },
+    });
+    const data = creditPurchases.map((creditPurchase) => ({
+      name: creditPurchase.creditPackage.name,
+      purchased_credits: creditPurchase.purchased_credits,
+      price_paid: creditPurchase.price_paid,
+      purchase_at: creditPurchase.purchase_at,
+    }));
+    res.json({
+      status: "success",
+      data: data,
+    });
+    return;
+  },
+  async getUserCourses(req, res, next) {
+    const userId = req.user.id;
+
+    const creditPurchaseRepo = dataSource.getRepository("CreditPurchase");
+
+    const creditPurchases = await creditPurchaseRepo.find({
+      where: {
+        user_id: userId,
+      },
+    });
+    const totalPurchasedCredits = creditPurchases.reduce(
+      (total, creditPurchase) => total + creditPurchase.purchased_credits,
+      0,
+    );
+    const courseBookingRepo = dataSource.getRepository("CourseBooking");
+
+    const courseBookings = await courseBookingRepo.find({
+      where: {
+        user_id: userId,
+      },
+      relations: {
+        course: {
+          user: true,
+        },
+      },
+      order: {
+        course: {
+          start_at: "ASC",
+        },
+      },
+    });
+    const creditUsage = courseBookings.filter((courseBooking) => courseBooking.cancelled_at === null).length;
+    const creditRemain = totalPurchasedCredits - creditUsage;
+    const courseBookingData = courseBookings.map((courseBooking) => ({
+      course_id: courseBooking.course_id,
+      name: courseBooking.course.name,
+      start_at: courseBooking.course.start_at,
+      end_at: courseBooking.course.end_at,
+      meeting_url: courseBooking.course.meeting_url,
+      coach_name: courseBooking.course.user.name,
+      cancelled_at: courseBooking.cancelled_at,
+    }));
+    res.json({
+      status: "success",
+      data: {
+        credit_remain: creditRemain,
+        credit_usage: creditUsage,
+        course_booking: courseBookingData,
       },
     });
     return;
