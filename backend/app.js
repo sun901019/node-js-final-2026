@@ -8,6 +8,7 @@ const creditPackage = require("./routes/creditPackage");
 const adminCoaches = require("./routes/adminCoaches");
 const adminCourses = require("./routes/adminCourses");
 const coaches = require("./routes/coaches");
+const courses = require("./routes/courses");
 
 const app = express();
 app.use(cors());
@@ -29,7 +30,7 @@ app.use("/api/credit-package", creditPackage);
 app.use("/api/admin/coaches/courses", adminCourses);
 app.use("/api/admin/coaches", adminCoaches);
 app.use("/api/coaches", coaches);
-
+app.use("/api/courses", courses);
 // 404 錯誤
 app.use((req, res, next) => {
   res.status(404).json({

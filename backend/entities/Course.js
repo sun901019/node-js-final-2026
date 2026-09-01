@@ -1,4 +1,4 @@
-const { EntitySchema, JoinColumn } = require("typeorm");
+const { EntitySchema } = require("typeorm");
 module.exports = new EntitySchema({
   name: "Course",
   tableName: "courses",
@@ -56,7 +56,7 @@ module.exports = new EntitySchema({
     user: {
       type: "many-to-one",
       target: "User",
-      JoinColumn: {
+      joinColumn: {
         name: "user_id",
       },
     },
