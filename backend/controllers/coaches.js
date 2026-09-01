@@ -1,7 +1,7 @@
 const { dataSource } = require("../db/data-source");
 const appError = require("../utils/appError");
-const { isValidString, isInteger } = require("../utils/validUtils");
-
+const { isValidString, isInteger, isValidUUID } = require("../utils/validUtils");
+const { MoreThan } = require("typeorm");
 const coachesController = {
   async getCoaches(req, res, next) {
     const { per, page } = req.query;
@@ -42,7 +42,7 @@ const coachesController = {
   },
   async getCoach(req, res, next) {
     const { coachId } = req.params;
-    if (!isValidString(coachId) || coachId === "undefined") {
+    if (!isValidUUID(coachId)) {
       next(appError(400, "欄位未填寫正確"));
       return;
     }
@@ -93,10 +93,51 @@ const coachesController = {
     });
     return;
   },
+
   async getCoachCourses(req, res, next) {
+    const { coachId } = req.params;
+    if (!isValidUUID(coachId)) {
+      next(appError(400, "欄位未填寫正確"));
+      return;
+    }
+    const coachRepo = dataSource.getRepository("Coach");
+    const coach = await coachRepo.findOne({
+      where: {
+        id: coachId,
+      },
+      relations: {
+        user: true,
+      },
+    });
+    if (!coach) {
+      next(appError(400, "找不到該教練"));
+      return;
+    }
+    const courseRepo = dataSource.getRepository("Course");
+    const now = new Date();
+
+    const courses = await courseRepo.find({
+      where: {
+        user_id: coach.user_id,
+        end_at: MoreThan(now),
+      },
+      relations: {
+        skill: true,
+      },
+    });
+    const data = courses.map((course) => ({
+      id: course.id,
+      name: course.name,
+      description: course.description,
+      start_at: course.start_at,
+      end_at: course.end_at,
+      max_participants: course.max_participants,
+      coach_name: coach.user.name,
+      skill_name: course.skill.name,
+    }));
     res.json({
       status: "success",
-      data: {},
+      data: data,
     });
     return;
   },
